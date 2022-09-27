@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-class Regresion_Lineal:
+class RegresionLineal:
     
     def __init__(self,grado=1):
         self.grado = grado      
@@ -31,7 +31,7 @@ class Regresion_Lineal:
             (self.a_0,self.a_1,self.a_2) = tuple(np.dot(np.linalg.inv(A),b))
             return (self.a_0,self.a_1,self.a_2)
     
-    def line(self,x):
+    def eval(self,x):
         if self.grado == 1:
             return self.a_0 + self.a_1*x
         elif self.grado == 2:
@@ -42,12 +42,12 @@ class Regresion_Lineal:
         xaxis = np.linspace(xmin-1,xmax+1,num=50)
         plt.figure(dpi=100)
         plt.scatter(self.datos[0,:],self.datos[1,:],color='black')
-        plt.plot(xaxis,[self.line(x) for x in xaxis],color='red')
+        plt.plot(xaxis,[self.eval(x) for x in xaxis],color='red')
         plt.show()
 
     def metrics(self):
         S_t = np.sum((self.datos[1,:]-np.mean(self.datos,axis=1)[1])**2)
-        S_r = np.sum((self.datos[1,:]-self.line(self.datos[0,:]))**2)
+        S_r = np.sum((self.datos[1,:]-self.eval(self.datos[0,:]))**2)
         s_y = np.sqrt(S_t/(self.n-1))
         s_yx = np.sqrt(S_r/(self.n-(self.grado+1)))
         r2 = (S_t-S_r)/S_t
@@ -58,3 +58,70 @@ class Regresion_Lineal:
         print(f"Error estandar de la estimación: {s_yx}")
         print(f"S_r<S_t : {s_yx<s_y}")
         print(f"Coeficiente de determinación: {r2}")
+
+
+
+class InterpolacionLagrange:
+    
+    def __init__(self):
+        pass
+
+    def fit(self,data,grado=2):
+        self.data = data
+        if grado <= data.shape[0]-1:
+            self.grado = grado
+        else:
+            print("Grado no valido... se tomará el máximo grado posible")
+            self.grado = data.shape[0]-1
+
+    def eval(self,x):
+        sum = 0
+        for i in range(0,self.grado+1):
+            sum += self.__lagrange_p(i,x)*self.data[i,1]
+        return sum
+
+    def __lagrange_p(self,i,x):
+        prod = 1
+        for j in range(self.grado+1):
+            if j!=i:
+                prod *= (x-self.data[j,0])/(self.data[i,0]-self.data[j,0])
+        return prod
+
+    def plot(self):
+        x_axis = np.linspace(np.min(self.data,axis=0)[0],np.max(self.data,axis=0)[0],100)
+        plt.figure(dpi=200)
+        plt.scatter(self.data[:,0],self.data[:,1],color='black',s=50)
+        plt.plot(x_axis,[self.eval(x) for x in x_axis])
+        plt.show()
+
+class Splines:
+
+    def __init__(self):
+        pass
+
+    def fit(self,data,grado=2):
+        self.grado = grado
+        # ordenar de acuerdo a las coordenadas en x
+        self.data = data
+
+    def eval(self,x):
+        # determinar en que intervalo está
+        sum = 0
+        for i in range(0,self.grado+1):
+            sum += self.__lagrange_p(i,x)*self.data[i,1]
+        return sum
+
+    def __lagrange_p(self,i,x):
+        prod = 1
+        for j in range(self.grado+1):
+            if j!=i:
+                prod *= (x-self.data[j,0])/(self.data[i,0]-self.data[j,0])
+        return prod
+
+    def plot(self):
+        x_axis = np.linspace(np.min(self.data,axis=0)[0],np.max(self.data,axis=0)[0],100)
+        plt.figure(dpi=200)
+        plt.scatter(self.data[:,0],self.data[:,1],color='black',s=50)
+        plt.plot(x_axis,[self.eval(x) for x in x_axis])
+        plt.show()
+
