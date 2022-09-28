@@ -102,25 +102,52 @@ class Splines:
     def fit(self,data,grado=2):
         self.grado = grado
         # ordenar de acuerdo a las coordenadas en x
-        self.data = data
+        self.data = np.array(sorted(data,key=lambda x:x[0]))
+        self.num_points = self.data.shape[0]-1
+        n = self.num_points
+        self.A = np.zeros(shape=(3*n,3*n))
+        self.b = np.zeros(shape=(3*n,))
+        # Llenar A:
+        self.A[0,:3] = self.__block(0,order=0) # Extremo izquierdo
+        for j in range(1,n):
+            pos = j-1
+            self.A[2*j-1,3*pos:3*pos+3] = self.__block(j,order=0)
+            self.A[2*j,3*(pos+1):3*(pos+1)+3] = self.__block(j,order=0)
+        self.A[2*n-1,-3:] = self.__block(n,order=0) # Extremo derecho
+        for j in range(1,n):
+            pos = 3*(j-1)
+            self.A[2*n+j-1,pos:pos+6] = self.__block(j,order=1)
+        self.A[3*n-1,0] = 1  # Condición a1=0
+        # Llenar b:
+        self.b[0] = self.data[0,1]
+        for j in range(1,n):
+            self.b[2*j-1] = self.data[j,1]
+            self.b[2*j] = self.data[j,1] 
+        self.b[2*n-1] = self.data[-1,1]
+        # Resolver la ecuación:
+        W = np.dot(np.linalg.inv(self.A),self.b)
+        self.coefs = np.reshape(W,newshape=(-1,3))
+        return self.coefs
+
+    def __block(self,i,order):
+        if order==0:
+            return np.array([self.data[i,0]**2,self.data[i,0],1])
+        if order==1:
+            return np.array([2*self.data[i,0],1,0,-2*self.data[i,0],-1,0])
 
     def eval(self,x):
         # determinar en que intervalo está
-        sum = 0
-        for i in range(0,self.grado+1):
-            sum += self.__lagrange_p(i,x)*self.data[i,1]
-        return sum
-
-    def __lagrange_p(self,i,x):
-        prod = 1
-        for j in range(self.grado+1):
-            if j!=i:
-                prod *= (x-self.data[j,0])/(self.data[i,0]-self.data[j,0])
-        return prod
+        idx = np.where(x-self.data[:,0]<0)[0][0]
+        if idx == 0 or idx == self.data.shape[0]:
+            print("Point to evaluate is outside of interval.")
+        else:
+            # print(f"Using {idx-1}-th funcion")
+            x = np.array([x**2,x,1])
+            return np.dot(self.coefs[idx-1,:],x)
 
     def plot(self):
         x_axis = np.linspace(np.min(self.data,axis=0)[0],np.max(self.data,axis=0)[0],100)
-        plt.figure(dpi=200)
+        plt.figure(dpi=150)
         plt.scatter(self.data[:,0],self.data[:,1],color='black',s=50)
         plt.plot(x_axis,[self.eval(x) for x in x_axis])
         plt.show()
