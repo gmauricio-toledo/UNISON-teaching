@@ -41,7 +41,7 @@ b(2*n) = data(num_points,2);
 
 # ------ Solve the system -------
 solucion = linsolve(A,b);
-coeficientes = reshape(solucion,n,3)
+coeficientes = reshape(solucion,3,n)'
 
-display(A)
-display(b)
+##display(A)
+##display(b)
