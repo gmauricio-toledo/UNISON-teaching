@@ -10,8 +10,10 @@ class RegresionLineal:
             print("El grado debe ser 1 o 2.")  
 
     def fit(self,datos):
-        self.datos = datos.copy()
-        self.n = datos.shape[1]
+        if datos.shape[1]!=2:
+            raise ValueError("Matrix should have size n_points x 2")
+        self.datos = np.transpose(datos)  # Arreglar esto... que sea de n_points x 2
+        self.n = self.datos.shape[1]
         x_prom = np.mean(datos,axis=1)[0]
         y_prom = np.mean(datos,axis=1)[1]
         sum_xy = np.sum(datos[0,:]*datos[1,:])
