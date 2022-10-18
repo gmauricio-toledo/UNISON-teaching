@@ -7,7 +7,7 @@ class EulerEDO:
         self.f = f
         self.sol = sol
 
-    def fit(self,a,b,h,x0,y0):
+    def fit(self,a,b,h,x0,y0,heun=False):
         self.a = a
         self.b = b
         self.h = h
@@ -15,8 +15,12 @@ class EulerEDO:
         xs = np.linspace(a,b,n+1)
         ys = np.zeros_like(xs)
         ys[0] = y0
-        for j in range(1,n+1):
-            ys[j] = ys[j-1] + self.f(xs[j-1])*h
+        if not heun:
+            for j in range(1,n+1):
+                ys[j] = ys[j-1] + self.f(xs[j-1])*h
+        else:
+            for j in range(1,n+1):
+                ys[j] = ys[j-1] + (self.f(xs[j-1])+self.f(xs[j]))*h/2
         self.xs = xs
         self.ys = ys
     
