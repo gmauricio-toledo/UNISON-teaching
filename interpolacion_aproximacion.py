@@ -95,7 +95,7 @@ class InterpolacionLagrange:
 
     def plot(self):
         x_axis = np.linspace(np.min(self.data,axis=0)[0],np.max(self.data,axis=0)[0],100)
-        plt.figure(dpi=200)
+        plt.figure(dpi=100)
         plt.scatter(self.data[:,0],self.data[:,1],color='black',s=50)
         plt.plot(x_axis,[self.eval(x) for x in x_axis])
         plt.show()
@@ -156,7 +156,7 @@ class Splines:
 
     def plot(self):
         x_axis = np.linspace(np.min(self.data,axis=0)[0]+0.01,np.max(self.data,axis=0)[0]-0.01,100)
-        plt.figure(dpi=150)
+        plt.figure(dpi=100)
         plt.scatter(self.data[:,0],self.data[:,1],color='black',s=50)
         plt.plot(x_axis,[self.eval(x) for x in x_axis])
         plt.show()
