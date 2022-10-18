@@ -20,12 +20,13 @@ class EulerEDO:
         self.xs = xs
         self.ys = ys
     
-    def plot(self):
+    def plot(self,plot_nodes=True):
         xaxis = np.linspace(self.a,self.b,100)
         plt.figure(dpi=100)
         plt.plot(self.xs,self.ys,color='blue',label='Solución aprox')
-        plt.scatter(self.xs,self.ys,color='blue')
+        if plot_nodes:
+            plt.scatter(self.xs,self.ys,color='blue')
         if self.sol is not None:
             plt.plot(xaxis,[self.sol(x) for x in xaxis],color='red',label='Solución real')
             plt.legend(loc='best')
-        plt.show()  
+        plt.show()       
