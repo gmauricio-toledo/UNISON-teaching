@@ -14,7 +14,7 @@ class RegresionLineal:
         if self.grado > 2:
             raise ValueError("El grado debe ser 1 o 2.")  
 
-    def fit(self,datos):
+    def fit(self,datos,report=False):
         if datos.shape[1]!=2:
             raise ValueError("Matrix should have size n_points x 2")
         self.datos = datos.copy()
@@ -25,6 +25,8 @@ class RegresionLineal:
         sum_x_2s = np.sum(datos[:,0]*datos[:,0])
         sum_x = np.sum(datos[:,0])
         sum_y = np.sum(datos[:,1])
+        if report:
+            print(f"x_prom = {x_prom},\ny_prom = {y_prom},\nsum_xy = {sum_xy},\nsum_x_2s = {sum_x_2s},\nsum_x = {sum_x},\nsum_y = {sum_y}")
         if self.grado == 1:
             self.a_1 = (self.n*sum_xy - sum_x*sum_y)/(self.n*sum_x_2s - sum_x**2)
             self.a_0 = y_prom - self.a_1*x_prom
@@ -33,6 +35,8 @@ class RegresionLineal:
             sum_x_3s = np.sum(datos[:,0]*datos[:,0]*datos[:,0])
             sum_x_4s = np.sum(datos[:,0]*datos[:,0]*datos[:,0]*datos[:,0])
             sum_xxy = np.sum(datos[:,0]*datos[:,0]*datos[:,1])
+            if report:
+                print(f"sum_x_3s = {sum_x_3s},\nsum_x_4s = {sum_x_4s},\nsum_xxy = {sum_xxy}")
             A = np.array([[self.n,sum_x,sum_x_2s],[sum_x,sum_x_2s,sum_x_3s],[sum_x_2s,sum_x_3s,sum_x_4s]])
             b = np.array([sum_y,sum_xy,sum_xxy])
             (self.a_0,self.a_1,self.a_2) = tuple(np.dot(np.linalg.inv(A),b))
