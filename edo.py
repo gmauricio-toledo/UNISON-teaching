@@ -55,11 +55,15 @@ class EulerEDO:
 class RungeKutta2(EulerEDO):
 
     def __init__(self,f,sol=None,a2=0.5):
-         super().__init__(f,sol) 
-         self.a2 = a2
-         self.a1 = 1-a2
-         self.p = 1/(2*a2)
-         self.q = 1/(2*a2)
+        super().__init__(f,sol) 
+        self.a2 = a2
+        self.a1 = 1-a2
+        if a2!=0:
+            self.p = 1/(2*a2)
+            self.q = 1/(2*a2)
+        else:
+            self.p = 1
+            self.q = 1
 
     def fit(self,a,b,h,x0,y0):
         self.a = a
