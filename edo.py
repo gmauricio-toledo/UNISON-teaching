@@ -1,5 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
+from math import sqrt, e
+from numpy import sin, cos
 
 class EulerEDO:
 
@@ -47,6 +49,8 @@ class EulerEDO:
             valores_reales = self.sol(self.xs)
             errores_relativos = (self.sol(self.xs) - self.ys)/self.sol(self.xs)
             print_table(self.xs,self.ys,valores_reales,errores_relativos)
+            self.reales = valores_reales
+            self.ers = errores_relativos
         else:
             print("No hay una solución real") 
 
@@ -85,3 +89,59 @@ def print_table(xs,ys,yrs,ers):
     print("x\ty\ty real\terror rel")
     for x,y,y_real,er in zip(xs,ys,yrs,ers):
         print(f"{round(x,3)}\t{round(y,3)}\t{round(y_real,3)}\t{round(er,3)}")
+
+
+def load_example(example_number=0):
+    examples = {
+        0: {
+            'a':    0,
+            'b':    1,
+            'h':    0.25,
+            'x0':   0,
+            'y0':   1,
+            'f':    lambda x,y:(1+4*x)*sqrt(y),
+            'sol':  lambda x: 0.25*(x+2*x**2+2)**2
+        },
+        1: {
+            'a':    0,
+            'b':    4,
+            'h':    0.25,
+            'x0':   0,
+            'y0':   1,
+            'f':    lambda x,y:-2*x**3 + 12*x**2 - 20*x + 8.5,
+            'sol':  lambda x: -0.5*x**4 + 4*x**3 - 10*x**2 + 8.5*x + 1
+        },
+        2: {
+            'a':    0,
+            'b':    5,
+            'h':    0.5,
+            'x0':   0,
+            'y0':   1,
+            'f':    lambda x,y: y*sin(x),
+            'sol':  lambda x: (e**(1-cos(x)))
+        },
+        3: {
+            'a':    0,
+            'b':    1,
+            'h':    0.1,
+            'x0':   0,
+            'y0':   2,
+            'f':    lambda x,y: y*(1-y),
+            'sol':  lambda x: 2/(2-e**(-x))
+        },
+        4: {
+            'a':    -1,
+            'b':    2.25,
+            'h':    0.25,
+            'x0':   -1,
+            'y0':   e**(5/4),
+            'f':    lambda x,y: y*x**3-y,
+            'sol':  lambda x: e**(0.25*x**4 - x)
+        }
+
+    }
+    if example_number in examples.keys():
+        return examples[example_number]
+    else:
+        valid_values = list(examples.keys())
+        raise KeyError(f'{example_number} is not in valid values: {valid_values}')
