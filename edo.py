@@ -85,6 +85,14 @@ class RungeKutta2(EulerEDO):
         self.ys = ys
 
 
+class RungeKutta3(RungeKutta2):
+
+    def __init__(self,f,sol=None,a2=0.5):
+        super().__init__(f,sol,a2) 
+
+    def fit(self):
+        ...
+
 def print_table(xs,ys,yrs,ers):
     print("x\ty\ty real\terror rel")
     for x,y,y_real,er in zip(xs,ys,yrs,ers):
