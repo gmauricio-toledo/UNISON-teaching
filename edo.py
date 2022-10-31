@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from math import sqrt, e
 from numpy import sin, cos
+from scipy.stats import norm
 
 class EulerEDO:
 
@@ -41,7 +42,8 @@ class EulerEDO:
         if self.sol is not None:
             plt.plot(xaxis,[self.sol(x) for x in xaxis],color='red',label='Solución real')
             plt.legend(loc='best')
-        plt.xticks(self.xs)
+        if self.h>0.2:
+            plt.xticks(self.xs)
         plt.show()      
 
     def table(self):
@@ -85,13 +87,34 @@ class RungeKutta2(EulerEDO):
         self.ys = ys
 
 
-class RungeKutta3(RungeKutta2):
+class RungeKutta(EulerEDO):
 
-    def __init__(self,f,sol=None,a2=0.5):
-        super().__init__(f,sol,a2) 
+    def __init__(self,f,sol=None,order=3):
+        super().__init__(f,sol)
+        assert order==3 or order==4
+        self.order = order 
 
-    def fit(self):
-        ...
+    def fit(self,a,b,h,x0,y0):
+        assert a==x0        
+        self.a = a
+        self.b = b
+        self.h = h
+        n = int((b-a)/h)
+        xs = np.linspace(a,b,n+1)
+        ys = np.zeros_like(xs)
+        ys[0] = y0
+        for j in range(1,n+1):
+            k1 = self.f(xs[j-1],ys[j-1])
+            k2 = self.f(xs[j-1]+0.5*h,ys[j-1]+0.5*k1*h)
+            if self.order==3:
+                k3 = self.f(xs[j-1]+h,ys[j-1]-k1*h + 2*k2*h)
+                ys[j] = ys[j-1] + (1/6)*(k1 + 4*k2+k3)*h
+            elif self.order==4:
+                k3 = self.f(xs[j-1]+0.5*h,ys[j-1] + 0.5*k2*h)
+                k4 = self.f(xs[j-1]+h,ys[j-1] + k3*h)
+                ys[j] = ys[j-1] + (1/6)*(k1 + 2*k2+2*k3+k4)*h
+        self.xs = xs
+        self.ys = ys
 
 def print_table(xs,ys,yrs,ers):
     print("x\ty\ty real\terror rel")
@@ -145,6 +168,24 @@ def load_example(example_number=0):
             'y0':   e**(5/4),
             'f':    lambda x,y: y*x**3-y,
             'sol':  lambda x: e**(0.25*x**4 - x)
+        },
+        5: {
+            'a':    0,
+            'b':    4,
+            'h':    0.25,
+            'x0':   0,
+            'y0':   2,
+            'f':    lambda x,y: 4*e**(0.8*x)-0.5*y,
+            'sol':  lambda x: e**(-0.5*x)*(3.07692*e**(1.3*x) - 1.07692)
+        },
+        6: {
+            'a':    0,
+            'b':    4,
+            'h':    0.25,
+            'x0':   0,
+            'y0':   0.5,
+            'f':    lambda x,y: 10*e**(-(1/(2*0.075**2))*(x-2)**2)-0.6*y,
+            'sol':  lambda x: e**(-0.6*x)*(3.62402 - 3.12402*norm.cdf(18.888 - 9.42809*x))
         }
 
     }
