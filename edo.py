@@ -4,6 +4,16 @@ from math import sqrt, e
 from numpy import sin, cos
 from scipy.stats import norm
 
+
+class EDO_RK_Solver:
+
+    def __init__(self,f,sol=None,order=2):
+        pass
+
+    def fit(self,a,b,x0,y0):
+        pass
+
+
 class EulerEDO:
 
     def __init__(self,f,sol=None):
@@ -92,7 +102,7 @@ class RungeKutta(EulerEDO):
     def __init__(self,f,sol=None,order=3):
         super().__init__(f,sol)
         assert order==3 or order==4
-        self.order = order 
+        self.order = order
 
     def fit(self,a,b,h,x0,y0):
         assert a==x0        
@@ -115,6 +125,7 @@ class RungeKutta(EulerEDO):
                 ys[j] = ys[j-1] + (1/6)*(k1 + 2*k2+2*k3+k4)*h
         self.xs = xs
         self.ys = ys
+
 
 def print_table(xs,ys,yrs,ers):
     print("x\ty\ty real\terror rel")
