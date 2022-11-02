@@ -7,11 +7,63 @@ from scipy.stats import norm
 
 class EDO_RK_Solver:
 
-    def __init__(self,f,sol=None,order=2):
-        pass
+    def __init__(self,f,sol=None,order=2,a2=1,n_eqs=1):
+        self.f = f
+        self.sol = sol
+        self.n_eqs = n_eqs
+        assert order==2 or order==3 or order==4
+        self.order = order
+        if order==2:
+            self.a2 = a2
+            self.a1 = 1-a2
+            if a2!=0:
+                self.p = 1/(2*a2)
+                self.q = 1/(2*a2)
+            else:
+                self.p = 1
+                self.q = 1
+        
 
-    def fit(self,a,b,x0,y0):
-        pass
+    def fit(self,a,b,y0,h):
+        if y0.shape[0]!=self.n_eqs:
+            raise ValueError(f"Number of initial conditions {y0.shape[0]} and number of equations {self.n_eqs} should be equal")
+        self.a = a
+        self.b = b
+        self.h = h
+        n = int((b-a)/h)
+        xs = np.linspace(a,b,n+1)
+        ys = np.zeros(shape=(self.n_eqs,xs.shape[0]))
+        ys[:,0] = y0
+        if self.order==2:
+            for j in range(1,n+1):
+                k1 = self.f(xs[j-1],ys[:,j-1])
+                k2 = self.f(xs[j-1]+self.p*h,ys[:,j-1]+self.q*k1*h)
+                ys[:,j] = ys[:,j-1] + (self.a1*k1 + self.a2*k2)*h 
+        if self.order==3:
+            pass
+        if self.order==4:
+            pass
+        self.xs = xs
+        self.ys = ys
+
+    def plot(self,plot_nodes=True,labels=None):
+        xaxis = np.linspace(self.a,self.b,100)
+        plt.figure(dpi=100)
+        for j in range(self.n_eqs):
+            if labels is None:
+                label = f'y_{j}'
+            else:
+                label = labels[j]
+            plt.plot(self.xs,self.ys[j,:],label=label)
+            if plot_nodes:
+                plt.scatter(self.xs,self.ys[j,:],color='black')
+        if self.sol is not None:
+            plt.plot(xaxis,[self.sol(x) for x in xaxis],color='red',label='Solución real')
+            plt.legend(loc='best')
+        if self.h>0.2:
+            plt.xticks(self.xs)
+        plt.legend(loc='best')
+        plt.show()   
 
 
 class EulerEDO:
@@ -19,7 +71,7 @@ class EulerEDO:
     def __init__(self,f,sol=None):
         self.f = f
         self.sol = sol
-
+        
     def fit(self,a,b,h,x0,y0,method='Euler'):
         self.a = a
         self.b = b
@@ -64,7 +116,7 @@ class EulerEDO:
             self.reales = valores_reales
             self.ers = errores_relativos
         else:
-            print("No hay una solución real") 
+            print("No analytic solution to compare...") 
 
 
 
