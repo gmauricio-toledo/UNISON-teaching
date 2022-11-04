@@ -65,6 +65,26 @@ class EDO_RK_Solver:
         plt.legend(loc='best')
         plt.show()   
 
+    def table(self):
+        head = "x\t"
+        for j in range(self.n_eqs):
+            head += f"y_{j}\t"
+        print(head)
+        for j,x in enumerate(self.xs):
+            row = f"{round(x,3)}\t"
+            for k in range(self.n_eqs):
+                row += f"{round(self.ys[k,j],4)}\t"
+            print(row)
+
+        # if self.sol is not None:
+        #     valores_reales = self.sol(self.xs)
+        #     errores_relativos = (self.sol(self.xs) - self.ys)/self.sol(self.xs)
+        #     print_table(self.xs,self.ys,valores_reales,errores_relativos)
+        #     self.reales = valores_reales
+        #     self.ers = errores_relativos
+        # else:
+        #     print("No analytic solution to compare...") 
+
 
 class EulerEDO:
 
