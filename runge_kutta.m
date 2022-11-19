@@ -1,14 +1,7 @@
 clc;
-global data = [1,0;4,1;6,7;6.5,8]; # Definimos los datos
 
-function prod = lagrange_n(i,x,grado)
-  global data;
-  prod = 1;
-  for j = 1:(grado+1)
-    if j!=i
-      prod = prod*((x-data(j,1))/(data(i,1)-data(j,1)));
-    endif
-  endfor
+function Y = F(x,y1,y2)
+  Y = ...
 endfunction
 
 function sum = evaluar(x,grado)
