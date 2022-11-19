@@ -32,8 +32,15 @@ class RootFinder:
                     error = 0
             elif method=='false-position':
                 self.root = x1 - (self.f(x1)*(x0-x1))/(self.f(x0)-self.f(x1))
+                # reasignar
             elif method=='newton':
                 self.root = root_old - self.f(root_old)/self.df(root_old)
+            elif method=='secant':
+                self.root = x1 - f(x1)*(x0-x1)/(f(x0)-f(x1))
+                x0 = x1
+                x1 = self.root
+            elif method=='fix':
+                pass
             self.roots.append(self.root)
             if self.root != 0:
                 error = self.__relative_error(self.root,root_old)
@@ -63,3 +70,14 @@ class RootFinder:
             plt.show()
         else:
             print("Run 'fit' method first")
+
+    def print_table(self):
+        pass
+        # head = "x\t"
+        # head += f"y_{j}\t"
+        # print(head)
+        # for j,x in enumerate(self.xs):
+        #     row = f"{round(x,3)}\t"
+        #     for k in range(self.n_eqs):
+        #         row += f"{round(self.ys[k,j],4)}\t"
+        #     print(row)
