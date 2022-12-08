@@ -228,7 +228,7 @@ def load_example(example_number=0):
         3: {
             'a':    0,
             'b':    1,
-            'h':    0.1,
+            'h':    0.25,
             'x0':   0,
             'y0':   2,
             'f':    lambda x,y: y*(1-y),
