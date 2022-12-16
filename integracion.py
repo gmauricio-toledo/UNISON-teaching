@@ -37,8 +37,8 @@ class Trapezoid:
         elif self.table:
             print("a,b,n will be ignored.")
             n_points = self.datos.shape[0]
-		a = self.datos[0,0]
-		b = self.datos[-1,0]
+            a = self.datos[0,0]
+            b = self.datos[-1,0]
             if a!=b:
                 if a<b:
                     self.a = a
