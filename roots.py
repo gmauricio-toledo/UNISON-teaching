@@ -78,7 +78,7 @@ class RootFinder:
             x_axis = np.linspace(self.root-window,self.root+window,100)
             plt.figure(dpi=100)
             plt.plot(x_axis,[self.f(x) for x in x_axis],color='black')
-            plt.plot(x_axis,[0 for x in x_axis],color='gray')
+            plt.axhline(0)
             plt.scatter([self.root],[self.f(self.root)])
             plt.show()
         else:
