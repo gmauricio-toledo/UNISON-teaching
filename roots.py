@@ -1,6 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
+from math import fabs
+import matplotlib.animation as animation
+import itertools
 
 class RootFinder:
 
@@ -27,7 +30,7 @@ class RootFinder:
         self.roots = []
         self.__check()
         error = 2*self.tolerance
-        while (error>self.tolerance):
+        while (error>self.tolerance) and self.n_iterations<10000:
             root_old = self.root
             if method=='bisection':
                 self.root = 0.5*(x0 + x1)
@@ -61,6 +64,8 @@ class RootFinder:
                 error = self.__relative_error(self.root,root_old)
             self.errors.append(error)
             self.n_iterations += 1
+        if self.n_iterations >= 10000:
+            print("Iteraciones máximas alcanzadas")
         return self.root
     
     def __check(self):
@@ -83,6 +88,38 @@ class RootFinder:
             plt.show()
         else:
             print("Run 'fit' method first")
+
+    def animate(self,fname):
+        def update(i):
+            ax.clear()
+            fig.suptitle(f"Iteración {i}")
+            ax.axhline(0,color='gray')
+            ax.plot(eje_x,eje_y,color='red')
+            ax.scatter([next(data_x)], [next(data_y)],s=50,color='black')
+        data_x = itertools.cycle(self.roots)
+        data_y = itertools.cycle(np.zeros_like(self.roots))
+        frames = len(self.roots)
+        if self.method in ['false-position','bisection']: 
+            window_width = fabs(self.x1-self.x0)
+            eje_x = np.linspace(start=self.x0-0.1*window_width,
+                                stop=self.x1+0.1*window_width,
+                                num=100)
+            eje_y = [self.f(x) for x in eje_x] 
+            fig, ax = plt.subplots(figsize=(7,5))
+            ani = animation.FuncAnimation(fig, update, frames=frames, interval=500)
+            ani.save(fname, writer='pillow')
+        elif self.method in ['fix','newton','secant']:
+            a, b = np.min(self.roots), np.max(self.roots)
+            window_width = fabs(b-a)
+            eje_x = np.linspace(start=a-0.1*window_width,
+                                stop=b+0.1*window_width,
+                                num=100)
+            eje_y = [self.f(x) for x in eje_x] 
+            fig, ax = plt.subplots(figsize=(7,5))
+            ani = animation.FuncAnimation(fig, update, frames=frames, interval=500)
+            ani.save(fname, writer='pillow')
+        else:
+            print("Something's wrong")
 
     def print_table(self,digits=5):
         data = {'n_iter': [j+1 for j,x in enumerate(self.roots)],
