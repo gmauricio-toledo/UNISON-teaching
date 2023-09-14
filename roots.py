@@ -7,8 +7,9 @@ import itertools
 
 class RootFinder:
 
-    def __init__(self):
+    def __init__(self,f):
         self.root = None
+        self.f = f
         self.methods = ['bisection',
                         'false-position',
                         'fix',
@@ -16,12 +17,12 @@ class RootFinder:
                         'secant'
                         ]
         print(f"Possible methods: {self.methods}")
+        self.plot(bracket=[-3,3])
 
-    def fit(self,f,tolerance,x0,x1=None,method='bisection',df=None):
+    def fit(self,tolerance,x0,x1=None,method='bisection',df=None):
         self.x0 = x0
         self.x1 = x1
         self.root = x0
-        self.f = f
         self.df = df
         self.tolerance = tolerance
         self.method = method
@@ -78,16 +79,22 @@ class RootFinder:
     def __relative_error(self,x_real,x_aprox):
         return abs(x_real-x_aprox)/abs(x_real) 
 
-    def plot(self,window=5):
+    def plot(self,bracket=None,window=5):
         if self.root is not None:
-            x_axis = np.linspace(self.root-window,self.root+window,100)
+            x_axis = np.linspace(self.root-0.5*window,self.root+0.5*window,100)
             plt.figure(dpi=100)
             plt.plot(x_axis,[self.f(x) for x in x_axis],color='black')
             plt.axhline(0)
             plt.scatter([self.root],[self.f(self.root)])
             plt.show()
+        elif isinstance(bracket,list):
+            x_axis = np.linspace(bracket[0],bracket[1],100)
+            plt.figure(dpi=100)
+            plt.plot(x_axis,[self.f(x) for x in x_axis],color='black')
+            plt.axhline(0)
+            plt.show()
         else:
-            print("Run 'fit' method first")
+            print("Run 'fit' method first or specify a valid bracket")
 
     def animate(self,fname):
         def update(i):
