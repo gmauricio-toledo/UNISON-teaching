@@ -54,7 +54,7 @@ class RootFinder:
             elif method=='newton':
                 self.root = root_old - self.f(root_old)/self.df(root_old)
             elif method=='secant':
-                self.root = x1 - f(x1)*(x0-x1)/(f(x0)-f(x1))
+                self.root = x1 - self.f(x1)*(x0-x1)/(self.f(x0)-self.f(x1))
                 x0 = x1
                 x1 = self.root
             elif method=='fix':
