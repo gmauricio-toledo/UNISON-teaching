@@ -30,6 +30,7 @@ class RegresionLineal:
         if self.grado == 1:
             self.a_1 = (self.n*sum_xy - sum_x*sum_y)/(self.n*sum_x_2s - sum_x**2)
             self.a_0 = y_prom - self.a_1*x_prom
+            print(f"Pendiente: {self.a_1}, Intercepto: {self.a_0}")
             return (self.a_0,self.a_1)
         elif self.grado == 2:
             sum_x_3s = np.sum(datos[:,0]*datos[:,0]*datos[:,0])
@@ -64,11 +65,11 @@ class RegresionLineal:
         r2 = (S_t-S_r)/S_t
         print(f"Error respecto al promedio: {S_t}")
         print(f"Error cuadrático: {S_r}")
-        print(f"S_r<S_t : {S_r<S_t}")
+        print(f"S_r < S_t : {S_r<S_t}")
         print(f"Desviación estandar de los datos y_i: {s_y}")
-        print(f"Error estandar de la estimación: {s_yx}")
-        print(f"S_r<S_t : {s_yx<s_y}")
-        print(f"Coeficiente de determinación: {r2}")
+        print(f"Error estandar de la estimación (s_yx): {s_yx}")
+        print(f"S_yx < S_y : {s_yx<s_y}")
+        print(f"Coeficiente de determinación r2: {r2}")
 
 
 class InterpolacionLagrange:

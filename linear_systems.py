@@ -39,9 +39,11 @@ def is_smaller_enough(X,norma):
     return bool(np.prod(np.abs(X)<norma))
 
 
-def eliminacion_gaussiana(A,resultados_parciales=False):
-    if resultados_parciales: print("Inicial:\n", A)
+def eliminacion_gaussiana(A,b,resultados_parciales=False):
     n = A.shape[0]
+    assert b.shape[0] == n
+    A = np.hstack((A,b.reshape(-1,1)))
+    if resultados_parciales: print("Inicial:\n", A)
     for k in range(n-1):
         for i in range(k+1,n):
             ratio = A[i,k]/A[k,k]
