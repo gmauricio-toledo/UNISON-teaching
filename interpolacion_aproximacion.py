@@ -117,7 +117,15 @@ class Splines:
         self.num_points = self.data.shape[0]-1
         n = self.num_points
         if self.grado == 1:
-            pass
+            self.coefs = np.zeros(shape=(n,2))
+            for j,row in enumerate(self.coefs):
+                fx0 = self.data[j,1]
+                fx1 = self.data[j+1,1]
+                x0 = self.data[j,0]
+                x1 = self.data[j+1,0]
+                self.coefs[j,0] = (fx1-fx0)/(x1-x0)
+                self.coefs[j,1] = fx0 - x0*(fx1-fx0)/(x1-x0)
+            return self.coefs
         if self.grado == 2:
             self.A = np.zeros(shape=(3*n,3*n))
             self.b = np.zeros(shape=(3*n,))
@@ -152,12 +160,20 @@ class Splines:
     def eval(self,x):
         # determinar en que intervalo está
         idx = np.where(x-self.data[:,0]<0)[0][0]
-        if idx == 0 or idx == self.data.shape[0]:
-            print("Point to evaluate is outside of interval.")
-        else:
-            # print(f"Using {idx-1}-th funcion")
-            x = np.array([x**2,x,1])
-            return np.dot(self.coefs[idx-1,:],x)
+        if self.grado == 1:
+            if idx == 0 or idx == self.data.shape[0]:
+                print("Point to evaluate is outside of interval.")
+            else:
+                # print(f"Using {idx-1}-th funcion")
+                x = np.array([x,1])
+                return np.dot(self.coefs[idx-1,:],x)
+        elif self.grado == 2:
+            if idx == 0 or idx == self.data.shape[0]:
+                print("Point to evaluate is outside of interval.")
+            else:
+                # print(f"Using {idx-1}-th funcion")
+                x = np.array([x**2,x,1])
+                return np.dot(self.coefs[idx-1,:],x)
 
     def plot(self):
         x_axis = np.linspace(np.min(self.data,axis=0)[0]+0.01,np.max(self.data,axis=0)[0]-0.01,100)
