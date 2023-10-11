@@ -182,3 +182,13 @@ class Splines:
         plt.plot(x_axis,[self.eval(x) for x in x_axis])
         plt.show()
 
+    def print_coef(self):
+        if self.grado == 1:
+            letras = ['m','b']
+        elif self.grado == 2:
+            letras = ['a','b','c']
+        for j,triplet in enumerate(self.coefs):
+            for letra, x in zip(letras, triplet):
+                print(f"{letra}_{j+1}: {round(x,4)} ", end='\t')
+            print()
+
