@@ -27,10 +27,13 @@ class Trapezoid:
                 elif b<a:
                     print(f"It should be {a}<{b}... considering the interval as [{b},{a}].")
                     self.a,self.b = b,a
-                h = (self.b-self.a)/self.n
-                sum = 0
-                for j in range(1,self.n):
-                    sum += self.f(self.a+j*h)
+                # h = (self.b-self.a)/self.n
+                # sum = 0
+                # for j in range(1,self.n):
+                #     sum += self.f(self.a+j*h)
+                self.nodes = np.linspace(self.a,self.b,num=n+1)
+                fxs = [self.f(x) for x in self.nodes[1:-1]]
+                sum = np.sum(fxs)
                 self.aprox = (self.b-self.a)*(self.f(self.a)+2*sum+self.f(self.b))/(2*self.n)    
             else:
                 self.aprox = 0
@@ -109,7 +112,7 @@ class Simpson:
                 sum_odd = 0
                 for j in range(n//2):
                     sum_odd += self.f(a + (2*j+1)*h)
-                for j in range(n//2):
+                for j in range(1,n//2):
                     sum_even += self.f(a + (2*j)*h)
                 self.aprox = (self.b-self.a)*(self.f(self.a)+4*sum_odd+2*sum_even+self.f(self.b))/(3*self.n)    
             else:
@@ -136,10 +139,11 @@ class Simpson:
             plt.plot([x,x],[0,self.f(x)],color='gray')
         plt.show()
 
-    def get_errors(self,dx4_prom,real_value=None,silent=False):
-        self.aprox_error = -dx4_prom*(self.b-self.a)**5/(2880*self.n**4)
-        if not silent:
-            print(f"Error aproximado: {self.aprox_error}")
+    def get_errors(self,dx4_prom=None,real_value=None,silent=False):
+        if dx4_prom is not None:
+            self.aprox_error = -dx4_prom*(self.b-self.a)**5/(180*self.n**4)
+            if not silent:
+                print(f"Error aproximado: {self.aprox_error}")
         if real_value is not None:
             self.real_error = (real_value - self.aprox)/real_value
             if not silent:
