@@ -205,7 +205,8 @@ def load_example(example_number=0):
             'x0':   0,
             'y0':   1,
             'f':    lambda x,y:(1+4*x)*sqrt(y),
-            'sol':  lambda x: 0.25*(x+2*x**2+2)**2
+            'sol':  lambda x: 0.25*(x+2*x**2+2)**2,
+            'function_f': "(1+4*x)*sqrt(y)"
         },
         1: {
             'a':    0,
@@ -214,7 +215,8 @@ def load_example(example_number=0):
             'x0':   0,
             'y0':   1,
             'f':    lambda x,y:-2*x**3 + 12*x**2 - 20*x + 8.5,
-            'sol':  lambda x: -0.5*x**4 + 4*x**3 - 10*x**2 + 8.5*x + 1
+            'sol':  lambda x: -0.5*x**4 + 4*x**3 - 10*x**2 + 8.5*x + 1,
+            'function_f': "-2*x**3 + 12*x**2 - 20*x + 8.5"
         },
         2: {
             'a':    0,
@@ -267,4 +269,4 @@ def load_example(example_number=0):
         return examples[example_number]
     else:
         valid_values = list(examples.keys())
-        raise KeyError(f'{example_number} is not in valid values: {valid_values}')
+        raise KeyError(f'{example_number} is not a valid value: {valid_values}')
