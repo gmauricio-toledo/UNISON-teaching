@@ -5,7 +5,12 @@ from numpy import sin, cos
 from scipy.stats import norm
 
 
-class EDO_RK_Solver:
+class ODE_RK_Solver:
+    '''
+    Esta clase implementa métodos de Runge-Kutta de orden 2,3 o 4 para resolver sistemas de ecuaciones diferenciales
+        dY/dx = f(x,Y)
+    donde Y=(y1,...,yn) es una función de una variable independiente.
+    '''
 
     def __init__(self,f,sol=None,order=2,a2=1,n_eqs=1):
         self.f = f
@@ -131,41 +136,73 @@ class EulerEDO:
 
 
 
-class RungeKutta2(EulerEDO):
+## ------ ABANDONADO y OBSOLETO ------------
+# class RungeKutta2(EulerEDO):
+#     '''
+#     Clase que resuelve una EDO escalar usando Runge-Kutta de orden 2, hereda de la clase del método de Euler
+#     '''
 
-    def __init__(self,f,sol=None,a2=0.5):
-        super().__init__(f,sol) 
-        self.a2 = a2
-        self.a1 = 1-a2
-        if a2!=0:
-            self.p = 1/(2*a2)
-            self.q = 1/(2*a2)
-        else:
-            self.p = 1
-            self.q = 1
+#     def __init__(self,f,sol=None,a2=0.5):
+#         super().__init__(f,sol) 
+#         self.a2 = a2
+#         self.a1 = 1-a2
+#         if a2!=0:
+#             self.p = 1/(2*a2)
+#             self.q = 1/(2*a2)
+#         else:
+#             self.p = 1
+#             self.q = 1
 
-    def fit(self,a,b,h,x0,y0):
-        self.a = a
-        self.b = b
-        self.h = h
-        n = int((b-a)/h)
-        xs = np.linspace(a,b,n+1)
-        ys = np.zeros_like(xs)
-        ys[0] = y0
-        for j in range(1,n+1):
-            k1 = self.f(xs[j-1],ys[j-1])
-            k2 = self.f(xs[j-1]+self.p*h,ys[j-1]+self.q*k1*h)
-            ys[j] = ys[j-1] + (self.a1*k1 + self.a2*k2)*h 
-        self.xs = xs
-        self.ys = ys
+#     def fit(self,a,b,h,x0,y0):
+#         self.a = a
+#         self.b = b
+#         self.h = h
+#         n = int((b-a)/h)
+#         xs = np.linspace(a,b,n+1)
+#         ys = np.zeros_like(xs)
+#         ys[0] = y0
+#         for j in range(1,n+1):
+#             k1 = self.f(xs[j-1],ys[j-1])
+#             k2 = self.f(xs[j-1]+self.p*h,ys[j-1]+self.q*k1*h)
+#             ys[j] = ys[j-1] + (self.a1*k1 + self.a2*k2)*h 
+#         self.xs = xs
+#         self.ys = ys
 
 
 class RungeKutta(EulerEDO):
+    '''
+    Implementación de los métodos de Runge-Kutta de orden 2,3,4 para resolver EDOs escalares
+    '''
 
-    def __init__(self,f,sol=None,order=3):
+    def __init__(self,f,sol=None,order=3,a_order2=None,name=None):
         super().__init__(f,sol)
-        assert order==3 or order==4
+        assert order==2 or order==3 or order==4
         self.order = order
+        if name is not None:
+            name_meaning_dict = {'Euler': 0,
+                                 'Heun': 0.5,
+                                 'Mid': 1,
+                                 'Ralston': 2/3}
+            if name in name_meaning_dict.keys():
+                self.a2 = name_meaning_dict[name]
+                self.__get_params()
+                self.order = 2
+        else:
+            if self.order == 2:
+                assert a_order2 is not None
+                self.a2 = a_order2
+                self.__get_params()
+
+    def __get_params(self):
+        '''
+        función que obtiene el resto de parametros de RK de orden 2 a partir del valor de a2
+        '''
+        self.a1 = 1-self.a2
+        if self.a2!=0:
+            self.p = 1/(2*self.a2)
+        else:
+            self.p = 1
+        self.q = self.p
 
     def fit(self,a,b,h,x0,y0):
         assert a==x0        
@@ -178,14 +215,18 @@ class RungeKutta(EulerEDO):
         ys[0] = y0
         for j in range(1,n+1):
             k1 = self.f(xs[j-1],ys[j-1])
-            k2 = self.f(xs[j-1]+0.5*h,ys[j-1]+0.5*k1*h)
-            if self.order==3:
-                k3 = self.f(xs[j-1]+h,ys[j-1]-k1*h + 2*k2*h)
-                ys[j] = ys[j-1] + (1/6)*(k1 + 4*k2+k3)*h
-            elif self.order==4:
-                k3 = self.f(xs[j-1]+0.5*h,ys[j-1] + 0.5*k2*h)
-                k4 = self.f(xs[j-1]+h,ys[j-1] + k3*h)
-                ys[j] = ys[j-1] + (1/6)*(k1 + 2*k2+2*k3+k4)*h
+            if self.order==2:
+                k2 = self.f(xs[j-1]+self.p*h,ys[j-1]+self.q*k1*h)
+                ys[j] = ys[j-1] + (self.a1*k1 + self.a2*k2)*h 
+            else:
+                k2 = self.f(xs[j-1]+0.5*h,ys[j-1]+0.5*k1*h)
+                if self.order==3:
+                    k3 = self.f(xs[j-1]+h,ys[j-1]-k1*h + 2*k2*h)
+                    ys[j] = ys[j-1] + (1/6)*(k1 + 4*k2+k3)*h
+                elif self.order==4:
+                    k3 = self.f(xs[j-1]+0.5*h,ys[j-1] + 0.5*k2*h)
+                    k4 = self.f(xs[j-1]+h,ys[j-1] + k3*h)
+                    ys[j] = ys[j-1] + (1/6)*(k1 + 2*k2+2*k3+k4)*h
         self.xs = xs
         self.ys = ys
 
@@ -225,7 +266,8 @@ def load_example(example_number=0):
             'x0':   0,
             'y0':   1,
             'f':    lambda x,y: y*sin(x),
-            'sol':  lambda x: (e**(1-cos(x)))
+            'sol':  lambda x: (e**(1-cos(x))),
+            'function_f': "y*sin(x)"
         },
         3: {
             'a':    0,
@@ -234,16 +276,18 @@ def load_example(example_number=0):
             'x0':   0,
             'y0':   2,
             'f':    lambda x,y: y*(1-y),
-            'sol':  lambda x: 2/(2-e**(-x))
+            'sol':  lambda x: 2/(2-e**(-x)),
+            'function_f': "y*(1-y)"
         },
         4: {
-            'a':    -1,
+            'a':    1,
             'b':    2.25,
             'h':    0.25,
-            'x0':   -1,
-            'y0':   e**(5/4),
+            'x0':   1,
+            'y0':   e**(-0.75),
             'f':    lambda x,y: y*x**3-y,
-            'sol':  lambda x: e**(0.25*x**4 - x)
+            'sol':  lambda x: e**(0.25*x**4 - x),
+            'function_f': "y*x**3-y"
         },
         5: {
             'a':    0,
@@ -252,7 +296,8 @@ def load_example(example_number=0):
             'x0':   0,
             'y0':   2,
             'f':    lambda x,y: 4*e**(0.8*x)-0.5*y,
-            'sol':  lambda x: e**(-0.5*x)*(3.07692*e**(1.3*x) - 1.07692)
+            'sol':  lambda x: e**(-0.5*x)*(3.07692*e**(1.3*x) - 1.07692),
+            'function_f': "4*e**(0.8*x)-0.5*y"
         },
         6: {
             'a':    0,
@@ -261,7 +306,8 @@ def load_example(example_number=0):
             'x0':   0,
             'y0':   0.5,
             'f':    lambda x,y: 10*e**(-(1/(2*0.075**2))*(x-2)**2)-0.6*y,
-            'sol':  lambda x: e**(-0.6*x)*(3.62402 - 3.12402*norm.cdf(18.888 - 9.42809*x))
+            'sol':  lambda x: e**(-0.6*x)*(3.62402 - 3.12402*norm.cdf(18.888 - 9.42809*x)),
+            'function_f': "10*e**(-(1/(2*0.075**2))*(x-2)**2)-0.6*y"
         }
 
     }
